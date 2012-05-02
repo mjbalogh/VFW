@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<!-- Project 1 -->
+<!-- Michael Balogh -->
+<!-- VFW 1205 -->
+<html>
+	<head>
+		<!-- meta tags -->
+		<meta charset="utf-8">
+		<meta name="description" content="Web-based snippet app for VFW class at Full Sail" />
+		<meta name="keywords" content="code snippets, programming, development, Full Sail University, Mobile Development, VFW, Visual Frameworks" />
+		<meta name="application-name" content="My Snippets" />
+		<meta name="robots" content="index,follow" />
+		<meta name="viewport" content="width=device-width user-scalable=no" />
+
+		<title>My Snippets - Add Snippet</title>
+	</head>
+	<body>
+		<header>
+			<headergroup>
+				<h1>My Snippets</h1>
+				<h2>Add a new snippet</h2>
+			</headergroup>
+		</header>
+		<form action="#" method="post">
+			<fieldset>
+				<legend>Details</legend>
+				<div>
+					<label for="language">Language</label>
+					<select name="language" autoselect>
+						<optgroup label="Compiled Languages">
+							<option value="Assembly">Assembly</option>
+							<option value="C">C</option>
+							<option value="C++">C++</option>
+							<option value="Pascal">Pascal</option>
+							<option value="Java"></option>
+						</optgroup>
+						<optgroup label="Scripting Languages">
+							<option value="Bash">Bash</option>
+							<option value="HTML">HTML</option>
+							<option value="JavaScript">JavaScript</option>
+							<option value="CSS">CSS</option>
+							<option value="Perl">Perl</option>
+							<option value="PHP">PHP</option>
+							<option value="Python">Python</option>
+							<option value="Ruby">Ruby</option>
+						</optgroup>
+					</select>
+				</div>
+				<div>
+					<label for="sname">Name</label>
+					<input type="text" name="sname" id="sname" placeholder="Enter snippet name" />
+				</div>
+				<div>
+					<label for="relevance">Relevance</label>
+					<input type="range" name="relevance" id="relevance" min="0" max="100" value="0" step="1" />
+				</div>
+				<div>
+					<input type="checkbox" value="favorite" id="favorite" />
+					<label for="favorite">Mark as favorite</label>
+				</div>
+				<div>
+					<label for="added_on">Added on</label>
+					<input type="date" name="added_on" id="added_on" />
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>Snippet</legend>
+				<textarea name="snippet" id="snippet" placeholder="Enter snippet text here"></textarea>
+			</fieldset>
+			<input type="hidden" value="true" />
+			<div>
+				<input type="reset" />
+				<input type="submit" />
+			</div>
+		</form>
+		<footer>
+			<nav>
+				<a href="#">Display snippets</a>
+				<a href="#">Clear snippets</a>
+			</nav>
+		</footer>
+	</body>
+</html>
