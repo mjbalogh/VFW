@@ -28,7 +28,8 @@
 					item = document.createElement('li');// ,
 				item.id = lang.name;
 				// FIXME: there must be a better way
-				// :after content in li doesn't show in iphone simulator, so include it in the actual content instead.
+				// :after content in li doesn't show (it does in label tags inside li, but not in spans or the like) 
+				// in iphone simulator, so include it in the actual content instead.
 				item.innerHTML = lang.name + ' (' + lang.count.toString() + ')';
 				item.addEventListener('click', ns.liClick);
 				list.appendChild(item);
