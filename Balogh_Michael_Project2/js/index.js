@@ -25,19 +25,23 @@
 		} else {
 			for (var i = 0, len = langs.length; i < len; i++) {
 				var lang = langs[i];
-					item = document.createElement('li');
+					item = document.createElement('li');// ,
 				item.id = lang.name;
-				item.innerHTML = lang.name + " (" + lang.count.toString() + ")";
+				// FIXME: there must be a better way
+				// :after content in li doesn't show in iphone simulator, so include it in the actual content instead.
+				item.innerHTML = lang.name + ' (' + lang.count.toString() + ')';
 				item.addEventListener('click', ns.liClick);
 				list.appendChild(item);
 			}
 		}
 	};
-	//var nextPage = function () { window.location.href = "add_item.html"; };
-	
+
 	// public
 	ns.liClick = function () {
-		alert(this.id + " li clicked!");
+		ns.renderSnippetsByLang(this.id);
+		$('snippets_header').innerHTML = this.id + ' Snippets';
+		$('snippets').style.top = $('h1header').offsetHeight + 'px';
+		$('snippets_popup').style.display = "block";
 	};
 	ns.initPage = function () {
 		populateSnippetsList();

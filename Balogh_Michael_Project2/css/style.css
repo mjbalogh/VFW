@@ -16,6 +16,7 @@ header {
 	width: 100%;
 	z-index: 2;
 }
+#snippets_header { z-index: 6; }
 header h1 {
 	background-color: #474747;
 	font-weight: bolder;
@@ -35,7 +36,7 @@ header h2 {
 	margin: 0px 20%;
 	text-shadow: #222 0px 2px 3px;
 }
-#icon {
+#icon, #close {
 	background-color: #252525;
 	border: 1px solid #555;
 	-webkit-border-radius: .25em;
@@ -43,10 +44,10 @@ header h2 {
 	color: #ccc;
 	font-size: 1em;
 	font-weight: bolder;
-	padding: .25em .4em;
+	padding: .25em .5em;
 	text-shadow: #000 0px 2px 3px;
 }
-#content {
+#content, #snippets {
 	bottom: 24px;
 	overflow: scroll;
 	position: absolute;
@@ -54,6 +55,29 @@ header h2 {
 	width: 100%;
 	-webkit-overflow-scrolling: touch;
 	z-index: 1;
+}
+#snippets_popup {
+	background-color: rgba(0, 0, 0, .9);
+	display: none;
+	left: 0;
+	position: fixed;
+	top: 0;
+	height: 100%;
+	width: 100%;
+	-webkit-overflow-scrolling: touch;
+	z-index: 5;
+}
+.hidden {
+	display: none;
+	margin: 0;
+	padding: 0;
+}
+/*.left, .right { display: table-cell; }*/
+.left { float: left; width: 50%; }
+.right { float: right; width: 50%; }
+.full {
+	display: block;
+	width: 100%;
 }
 ul {
 	border: 1px solid #ccc;
@@ -119,11 +143,9 @@ footer span {
 
 /*index.html*/
 .iright {
-	display: inline;
 	position: fixed;
-	right: 0;
-	top: 0;
-	margin: .4em;
+	right: 2px;
+	top: 2px;
 	z-index: 3;
 }
 .tagline {
@@ -142,20 +164,23 @@ footer span {
 	text-align: center;
 }
 #greyed { color: #888; }
+/*.counted:after = {
+	content: " (" attr('data-count') ") ";
+	font-style: italic;
+}*/
+.fright = { float: right; text-align: middle; }
 
 /*add_item.html*/
 .ileft {
-	display: inline;
 	position: absolute;
-	left: 0;
-	top: 0;
-	margin: .4em;
+	left: 2px;
+	top: 2px;
 	z-index: 3;
 }
-li.legend {
+.legend {
 	padding: 0;
 }
-li.legend > span {
+.legend > span {
 	background-image: -webkit-linear-gradient(top, rgba(255,168,76,1) 0%,rgba(255,123,13,1) 100%);
 	background-image: -webkit-gradient(linear, left top, left bottom,
 		color-stop(0%,rgba(255,168,76,1)), color-stop(100%,rgba(255,123,13,1)));
