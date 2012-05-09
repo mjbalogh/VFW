@@ -64,21 +64,30 @@ header h2 {
 	top: 0;
 	height: 100%;
 	width: 100%;
-	-webkit-overflow-scrolling: touch;
 	z-index: 5;
 }
 .hidden {
-	display: none;
-	margin: 0;
-	padding: 0;
+	border: 1px solid #ccc;
 }
-/*.left, .right { display: table-cell; }*/
-.left { float: left; width: 50%; }
-.right { float: right; width: 50%; }
+.lpanel, .rpanel {
+	display: block;
+	padding: 5px;
+	width: 46%;
+}
+.lpanel {
+	background-color: #474747;
+	color: #888;
+	float: left;
+	text-shadow: #222 0px 2px 3px;
+}
+.rpanel {
+	float: right;
+}
 .full {
 	display: block;
 	width: 100%;
 }
+pre { margin: 1em; }
 ul {
 	border: 1px solid #ccc;
 	-webkit-border-radius: .5em;
@@ -178,6 +187,7 @@ footer span {
 	z-index: 3;
 }
 .legend {
+	clear: both;
 	padding: 0;
 }
 .legend > span {
