@@ -166,10 +166,10 @@
 		var name = $('name_' + this.id),
 			hidden = $('hidden_' + this.id);
 		if (hidden.style.display === "none") {
-			name.style.marginBottom = '5px';
+			// name.style.marginBottom = '5px';
 			hidden.style.display = "block"
 		} else {
-			name.style.marginBottom = 0;
+			// name.style.marginBottom = 0;
 			hidden.style.display = "none";
 		}
 	};

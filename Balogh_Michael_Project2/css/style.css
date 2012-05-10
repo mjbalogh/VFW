@@ -56,6 +56,7 @@ header h2 {
 	-webkit-overflow-scrolling: touch;
 	z-index: 1;
 }
+#snippets { bottom: 0; }
 #snippets_popup {
 	background-color: rgba(0, 0, 0, .9);
 	display: none;
@@ -66,9 +67,7 @@ header h2 {
 	width: 100%;
 	z-index: 5;
 }
-.hidden {
-	border: 1px solid #ccc;
-}
+.hidden { margin: 10px -12px; }
 .lpanel, .rpanel {
 	display: block;
 	padding: 5px;
@@ -80,14 +79,11 @@ header h2 {
 	float: left;
 	text-shadow: #222 0px 2px 3px;
 }
-.rpanel {
-	float: right;
-}
+.rpanel { float: right; }
 .full {
 	display: block;
 	width: 100%;
 }
-pre { margin: 1em; }
 ul {
 	border: 1px solid #ccc;
 	-webkit-border-radius: .5em;
@@ -173,11 +169,7 @@ footer span {
 	text-align: center;
 }
 #greyed { color: #888; }
-/*.counted:after = {
-	content: " (" attr('data-count') ") ";
-	font-style: italic;
-}*/
-.fright = { float: right; text-align: middle; }
+/*.fright = { float: right; text-align: middle; }*/
 
 /*add_item.html*/
 .ileft {
