@@ -10,7 +10,7 @@
 		<meta name="keywords" content="code snippets, programming, development, Full Sail University, Mobile Development, VFW, Visual Frameworks" />
 		<meta name="application-name" content="My Snippets" />
 		<meta name="robots" content="index,follow" />
-		<meta name="viewport" content="width=device-width user-scalable=no" />
+		<meta name="viewport" content="user-scalable=no width=device-width height=device-height minimum-scale=1.0 maximum-scale=1.0 initial-scale=1.0" />
 		<!-- run in "full screen" mode -->
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
@@ -20,59 +20,56 @@
 		<link rel="stylesheet" href="css/style.css" type="text/css" media="screen" title="main" charset="utf-8" />
 	</head>
 	<body>
-		<header>
+		<header id="header">
 			<hgroup>
 				<h1 id="h1header">My Snippets</h1>
 				<h2 id="h2header">Add snippet</h2>
 			</hgroup>
 		</header>
-		<span class="ileft" id="icon">&#9664;</span>
+		<nav><span class="ileft" id="back_icon">&#9664;</span><span class="ileft" id="close_icon">&#10006;</span><span class="iright" id="add_icon">&#10010;</span></nav>
 		<div id="content">
 			<form action="#" method="post" id="snippet_form">
 				<ul>
 					<li class="legend"><span>Details</span></li>
 					<li><label for"language" class="required">Language</label>
-						<select name="language" id="language" size="1" autoselect>
+						<select name="language" id="language" size="1" tabindex="1" autoselect>
 							<option value="-- Select Language --">-- Select Language --</option>
 						</select>
 					</li>
 					<li><label for="name" class="required">Name</label>
-						<input type="text" name="name" id="name" placeholder="Snippet name" />
+						<input type="text" name="name" id="name" tabindex="2"placeholder="Snippet name" />
 					</li>
 					<li>
 						<label for="added_on" class="required">Added on</label>
-						<input type="date" name="added_on" id="added_on" />
+						<input type="date" name="added_on" id="added_on" tabindex="3" />
 					</li>
 					<li>
 						<label for="relevance">Relevance</label>
-						<input type="range" name="relevance" value="0" id="relevance" min="0" max="100" step="1" />
+						<input type="range" name="relevance" value="0" id="relevance" min="0" max="100" step="1" tabindex="4" />
 					</li>
 					<li>
-						<input type="checkbox" name="favorite" id="favorite" />
+						<input type="checkbox" name="favorite" id="favorite" tabindex="5" />
 						<label for="favorite">Mark as favorite</label>
 					</li>
 				</ul>
 				<ul>
 					<li class="legend"><span>Snippet</span></li>
-					<li><textarea name="snippet" rows="8" cols="42" id="snippet" placeholder="Enter snippet text here"></textarea></li>
+					<li><textarea name="snippet" rows="8" cols="42" id="snippet" tabindex="6" placeholder="Enter snippet text here"></textarea></li>
 				</ul>
 				<input type="hidden" value="true" />
 				<div class="actions">
 					<button type="reset">Reset</button>
-					<button type="submit" id="submit">Save</button>
+					<button type="submit" id="submit" tabindex="7">Save</button>
 				</div>
 			</form>
 		</div>
 		<div id="snippets_popup">
-			<header><h1 id="snippets_header"></h1></header>
-			<span class="iright" id="close">&#10006;</span>
 			<div id="snippets"></div>
 		</div>
-		<footer>
+		<footer id="footer">
 			<span id="show_all">Show all</span>
 			<span id="clear_all">Clear all</span>
 		</footer>
 		<script type="text/javascript" src="js/main.js"></script>
-		<script type="text/javascript" src="js/add_item.js"></script>
 	</body>
 </html>

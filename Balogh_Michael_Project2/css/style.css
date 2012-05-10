@@ -14,9 +14,9 @@ header {
 	text-align: center;
 	top: 0;
 	width: 100%;
-	z-index: 2;
+	z-index: 4;
 }
-#snippets_header { z-index: 6; }
+#snippets_header { z-index: 5; }
 header h1 {
 	background-color: #474747;
 	font-weight: bolder;
@@ -36,7 +36,7 @@ header h2 {
 	margin: 0px 20%;
 	text-shadow: #222 0px 2px 3px;
 }
-#icon, #close {
+#add_icon, #back_icon, #close_icon {
 	background-color: #252525;
 	border: 1px solid #555;
 	-webkit-border-radius: .25em;
@@ -47,25 +47,31 @@ header h2 {
 	padding: .25em .5em;
 	text-shadow: #000 0px 2px 3px;
 }
-#content, #snippets {
-	bottom: 24px;
+#close_icon {
+	background-color: rgb(181, 61, 86);
+	content: 'U+2716';
+	display: none;
+}
+.ileft, .iright {
+	position: fixed;
+	top: 2px;
+	z-index: 6;
+}
+.ileft { left: 2px; }
+.iright { right: 2px; }
+#content, #snippets_popup {
+	bottom: 0;
 	overflow: scroll;
 	position: absolute;
-	padding: 0;
+	padding-bottom: 24px;
 	width: 100%;
 	-webkit-overflow-scrolling: touch;
 	z-index: 1;
 }
-#snippets { bottom: 0; }
 #snippets_popup {
 	background-color: rgba(0, 0, 0, .9);
 	display: none;
-	left: 0;
-	position: fixed;
-	top: 0;
-	height: 100%;
-	width: 100%;
-	z-index: 5;
+	z-index: 3;
 }
 .hidden { margin: 10px -12px; }
 .lpanel, .rpanel {
@@ -147,12 +153,6 @@ footer span {
 }
 
 /*index.html*/
-.iright {
-	position: fixed;
-	right: 2px;
-	top: 2px;
-	z-index: 3;
-}
 .tagline {
 	background-image: -webkit-linear-gradient(top, rgba(212,228,239,1) 0%, rgba(134,174,204,1) 100%);
 	background-image: -webkit-gradient(linear, left top, left bottom,
@@ -169,15 +169,8 @@ footer span {
 	text-align: center;
 }
 #greyed { color: #888; }
-/*.fright = { float: right; text-align: middle; }*/
 
 /*add_item.html*/
-.ileft {
-	position: absolute;
-	left: 2px;
-	top: 2px;
-	z-index: 3;
-}
 .legend {
 	clear: both;
 	padding: 0;

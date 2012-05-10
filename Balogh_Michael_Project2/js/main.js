@@ -1,54 +1,76 @@
 (function(ns, $, undefined) {
-	// private
-	// privately duck punch RegExp until it sounds like it contains a function to escape special characters
-	RegExp.escape = function(str) {
-		return str.replace(/[[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
-	};
-	var title_case = function (string) {
-		// regexes to the rescue again. amazing how robust those little buggers are, isn't it?
-		return string.replace(/\w\S*/g, function(text) { return text.charAt(0).toUpperCase() + text.substr(1).toLowerCase(); });
-	};
-	var inline_replace = function (string, char1, char2) {
-		var pattern = new RegExp(RegExp.escape(char1), "g");
-		return string.replace(pattern, char2);
-	};
-	var getPageName = function () {
+	// private variables
+	var snippet_langs = ['Bash', 'CSS', 'HTML', 'JavaScript', 'Perl', 'PHP', 'Python', 'Ruby'];
+	
+	// private functions
+	var get_page_name = function () {
 		var path = window.location.pathname;
 		return path.substr(path.lastIndexOf('/') + 1);
 	};
-	var showAll = function () {
-		for (var i = 0, len = ns.langs.length; i < len; i++) {
-			var lang = ns.langs[i];
-			ns.renderSnippetsByLang(lang, true);
-		}
-		$('snippets_header').innerHTML = "All Snippets"
-		$('snippets').style.top = $('h1header').offsetHeight + 'px';
-		$('snippets_popup').style.display = "block";
-	};
-	var clearAll = function () {
-		window.localStorage.clear();
-		window.location.reload();
-	};
-	var navigate = function () {
-		var page = getPageName();
-		(page === 'index.html') ? window.location.assign("add_item.html") : window.location.assign("index.html");
-	};
-	var closePopup = function() {
-		$('snippets_popup').style.display = "none";
-		$('snippets_header').innerHTML = '';
-		$('snippets').innerHTML = '';
-	};
-	ns.renderSnippetsByLang = function (lang, showLegend) {
-		// var snippets_div = $('snippets'),
-		// 			ul = document.createElement('ul'),
-		// 			snippets, legend;
+	var load_counts = function () {
+		var array = [];
+		for (var i = 0, len = snippet_langs.length; i < len; i++) {
+			var lang = snippet_langs[i];
+			if (lang in localStorage) {
+				var snippets = JSON.parse(localStorage.getItem(lang)),
+					count = snippets.length;
 
+				if (count !== undefined && count > 0) {
+					array.push({name: lang, count: count});
+				}
+			}
+		}
+		return array;
+	};
+	var render_help_message = function (list) {
+		var item = document.createElement('li');
+		if (list.nodeName !== 'UL' && list.nodeName !== 'OL') {
+			console.log("render_help_message: element is not a list!");
+			return;
+		}
+		item.id = 'greyed';
+		item.innerHTML = "Click the '<strong>&#10010;</strong>' to add your first snippet.";
+		list.appendChild(item);
+	};
+	var populate_snippets_list = function () {
+		var langs = load_counts(),
+			list = $('snippet_list');
+		if (langs.length === 0) {
+			// var item = document.createElement('li');
+			// 			item.id = 'greyed';
+			// 			item.innerHTML = "Click the '<strong>&#10010;</strong>' to add your first snippet.";
+			// 			list.appendChild(item);
+			render_help_message(list);
+		} else {
+			for (var i = 0, len = langs.length; i < len; i++) {
+				var lang = langs[i],
+					item = document.createElement('li');
+				
+				item.id = lang.name;
+				// FIXME: there must be a better way
+				// :after content in li doesn't show (it does in label tags inside li, but not in spans or the like) 
+				// in iphone simulator, so include it in the actual content instead.
+				item.innerHTML = lang.name + ' (' + lang.count.toString() + ')';
+				item.addEventListener('click', clickListItem);
+				list.appendChild(item);
+			}
+		}
+	};
+	var populate_select = function () {
+		var select = $('language');
+		for (var i = 0, len = snippet_langs.length; i < len; i++) {
+			var option = document.createElement('option'),
+				language = snippet_langs[i];
+			option.value = language;
+			option.innerHTML = language;
+			select.appendChild(option);
+		}
+	};
+	var render_snippets_by_language = function (lang, showLegend) {
 		if (lang in localStorage) {
 			var snippets_div = $('snippets'),
 				wrapper = document.createElement('ul'),
 				snippets = JSON.parse(localStorage.getItem(lang));
-
-			// wrapper.setAttribute("class", "wrapper");
 			
 			showLegend = showLegend || false;
 			if (showLegend) {
@@ -77,8 +99,7 @@
 					sarea = document.createElement('div');
 					
 				li.id = snippet.details.id;
-				li.addEventListener('click', ns.expandSnippet);
-				name.id = "name_" + snippet.details.id;
+				li.addEventListener('click', expandSnippet);
 				nspan.setAttribute("class", "full");
 				nspan.innerHTML = snippet.details.name;
 				name.appendChild(nspan);
@@ -117,11 +138,8 @@
 						div2.innerHTML = title_case(inline_replace(key, "_", " ")) + ':';
 						lpanel.appendChild(div2);
 				}
-				// darea.appendChild(lpanel);
 				details.appendChild(lpanel);
-				// darea.appendChild(rpanel);
 				details.appendChild(rpanel);
-				// hidden.appendChild(darea);
 				hidden.appendChild(details);
 				
 				snip.setAttribute("class", "legend");
@@ -137,57 +155,141 @@
 			}
 			snippets_div.appendChild(wrapper);
 		}
-
-		// showLegend = showLegend || false;
-		// if (showLegend) {
-		// 			legend = document.createElement('li');
-		// 			legend.setAttribute("class", "legend");
-		// 			legend.innerHTML = '<span>' + lang + '</span>';
-		// 			ul.appendChild(legend);
-		// 		}
-		// 		for (var i = 0, len = snippets.length; i < len; i++) {
-		// 			var snippet = snippets[i],
-		// 				li = document.createElement('li'),
-		// 				lihtml = '<span class="full" id="sp_' + snippet.details.id + '">' + snippet.details.name + '</span>' +
-		// 					'<ul class="hidden" id="ul_' + snippet.details.id + '"><li class="legend"><span>Details</span></li>' +
-		// 					'<li><span class="left">Name</span><span class="right">' + snippet.details.name + '</span></li>'+
-		// 					'<li><span class="left">Added on</span><span class="right">' + snippet.details.added_on + '</span></li>' +
-		// 					'<li><span class="left">Relevance</span><span class="right">' + snippet.details.relevance + '</span></li>' +
-		// 					'<li><span class="left">Favorite</span><span class="right">' + ((snippet.details.favorite === 'on') ? "Yes" : "No") + '</span></li>' +
-		// 					'<li class="legend"><span>Snippet Code</span></li><li><span>' + snippet.snippet + '</span></li></ul>';
-		// 			li.id = snippet.details.id;
-		// 			li.innerHTML = lihtml;
-		// 			li.addEventListener('click', ns.expandSnippet);
-		// 			ul.appendChild(li);
-		// 		}
-		// snippets_div.appendChild(ul);
 	};
-	ns.expandSnippet = function() {
-		var name = $('name_' + this.id),
-			hidden = $('hidden_' + this.id);
-		if (hidden.style.display === "none") {
-			// name.style.marginBottom = '5px';
-			hidden.style.display = "block"
+
+	// *** START ripped from SDI Project 4 ***
+	// privately duck punch RegExp until it sounds like it contains a function to escape special characters
+	RegExp.escape = function(str) {
+		return str.replace(/[[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+	};
+	var title_case = function (string) {
+		// regexes to the rescue again. amazing how robust those little buggers are, isn't it?
+		return string.replace(/\w\S*/g, function(text) { return text.charAt(0).toUpperCase() + text.substr(1).toLowerCase(); });
+	};
+	var inline_replace = function (string, char1, char2) {
+		var pattern = new RegExp(RegExp.escape(char1), "g");
+		return string.replace(pattern, char2);
+	};
+	// *** END ripped from SDI Project 4 ***
+		
+	// event handlers
+	var showAll = function () {
+		if (load_counts().length === 0) {
+			var snippets_div = $('snippets'),
+				list = document.createElement('ul');
+			render_help_message(list);
+			snippets_div.appendChild(list);
 		} else {
-			// name.style.marginBottom = 0;
-			hidden.style.display = "none";
+			for (var i = 0, len = snippet_langs.length; i < len; i++) {
+				render_snippets_by_language(snippet_langs[i], true);
+			}
+		}
+		
+		$('h1header').innerHTML = "All Snippets"
+		if (get_page_name() === 'add_item.html') {
+			$('back_icon').style.display = "none";
+			$('add_icon').style.display = "inline";
+			$('h2header').style.display = "none";
+		}
+		$('close_icon').style.display = "inline";
+		$('snippets_popup').style.display = "block";
+	};
+	var clearAll = function () {
+		if (confirm("Are you sure?\n\nYou will not be able to recover the data you are about to erase.")) {
+			window.localStorage.clear(); // don't really care if it's empty or not.
+			window.location.reload();
 		}
 	};
-	ns.langs = ['Bash', 'CSS', 'HTML', 'JavaScript', 'Perl', 'PHP', 'Python', 'Ruby'];
+	var navigate = function () {
+		(this.id === "add_icon") ? window.location.assign("add_item.html") : window.location.assign("index.html");
+	};
+	var closePopup = function () {
+		$('snippets_popup').style.display = "none";
+		$('h1header').innerHTML = 'My Snippets';
+		$('close_icon').style.display = "none";
+		if (get_page_name() === 'add_item.html') {
+			$('add_icon').style.display = "none";
+			$('back_icon').style.display = "inline";
+			$('h2header').style.display = "block";
+		}
+		$('snippets').innerHTML = '';
+	};
+	var saveData = function () {
+		var language = $('language').value,
+			snippets = [], snippet = {};
+			
+		if (language in localStorage) {
+			snippets = JSON.parse(localStorage.getItem(language));
+		}
+		snippet = {
+			"details": {
+				"id": new Date().getTime(),
+				"name": $('name').value,
+				"added_on": $('added_on').value,
+				"relevance": $('relevance').value,
+				"favorite": $('favorite').value
+			},
+			"snippet": $('snippet').value
+		};
+		snippets.push(snippet);
+		localStorage.setItem(language.toString(), JSON.stringify(snippets));
+		
+		alert(snippet.details.name + " saved.");
+		return false;
+	};
+	var expandSnippet = function () {
+		var hidden = $('hidden_' + this.id);
+		(hidden.style.display === "none") ? hidden.style.display = "block" : hidden.style.display = "none";
+	};
+	var clickListItem = function () {
+		render_snippets_by_language(this.id);
+		$('h1header').innerHTML = this.id + ' Snippets';
+		$('close_icon').style.display = "inline";
+		$('snippets_popup').style.display = "block";
+	};
+		
+	//public
 	ns.initialize = function () {
 		// add event listeners
+		$('close_icon').addEventListener('click', closePopup);
+		$('add_icon').addEventListener('click', navigate);
 		$('show_all').addEventListener('click', showAll);
-		$('icon').addEventListener('click', navigate);
 		$('clear_all').addEventListener('click', clearAll);
-		$('close').addEventListener('click', closePopup);
 		
-		// fixup the positioning of content area.
+		// fixup the top location of content and snippet_popup areas.
 		$('content').style.top = $('h1header').offsetHeight + 'px';
-		if ($('h2header') !== null) {
+		$('snippets_popup').style.top = $('h1header').offsetHeight + 'px';
+		
+		// handle per-page setup
+		if (get_page_name() === 'index.html') {
+			populate_snippets_list();
+		} else {
+			// add event listeners
+			$('back_icon').addEventListener('click', navigate);
+			$('submit').addEventListener('click', saveData);
+			
+			populate_select();
+			
+			// fixup padding of content area
 			$('content').style.paddingTop = $('h2header').offsetHeight + 'px';
+			
+			// hide add_icon until needed
+			$('add_icon').style.display = "none";
+			
+			// hide/show the sub-header when the snippet textarea is being edited for visibility
+			$('snippet').addEventListener('focus', function() { 
+				$('h2header').style.display = "none";
+				$('footer').style.display = "none";
+			});
+			$('snippet').addEventListener('blur', function() {
+				$('h2header').style.display = "block";
+				$('footer').style.bottom = 0;
+				$('footer').style.display = "block";
+			});
 		}
 	};
 } (window.vfw = window.vfw || {}, function(element) { return document.getElementById(element); }));
+
 try {
 	document.addEventListener("DOMContentLoaded", vfw.initialize, false);
 } catch (e) {
