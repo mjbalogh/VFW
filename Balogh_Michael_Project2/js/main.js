@@ -126,11 +126,7 @@
 						if (key === 'name' || key == 'id') continue;
 						
 						// setup the right span
-						if (key !== "favorite") {
-							div1.innerHTML = snippet.details[key];
-						} else {
-							div1.innerHTML = (snippet.details[key] === "on") ? 'Yes' : 'No';
-						}
+						div1.innerHTML = snippet.details[key];
 						rpanel.appendChild(div1);
 						
 						// setup the left span
@@ -227,7 +223,7 @@
 				"name": $('name').value,
 				"added_on": $('added_on').value,
 				"relevance": $('relevance').value,
-				"favorite": $('favorite').value
+				"favorite": (($('favorite').checked) ? "Yes" : "No")
 			},
 			"snippet": $('snippet').value
 		};
