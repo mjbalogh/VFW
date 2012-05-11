@@ -59,6 +59,78 @@
 			select.appendChild(option);
 		}
 	};
+	var render_snippet = function (snippet) {
+		var li = document.createElement('li'),
+			name = document.createElement('div'),
+			nspan = document.createElement('span'),
+			hidden = document.createElement('div'),
+			details = document.createElement('div'),
+			dspan = document.createElement('span'),
+			darea = document.createElement('div'),
+			rpanel = document.createElement('div'),
+			lpanel = document.createElement('div'),
+			snip = document.createElement('div'),
+			sspan = document.createElement('span'),
+			sarea = document.createElement('div');
+			
+		if (snippet === null || snippet === undefined) {
+				throw "render_snippet: one or both of the required arguments is null";
+		}
+		
+		li.id = snippet.details.id;
+		li.addEventListener('click', expandSnippet);
+		nspan.setAttribute("class", "full");
+		nspan.innerHTML = snippet.details.name;
+		name.appendChild(nspan);
+		li.appendChild(name);
+				
+		// setup hidden div
+		hidden.id = "hidden_" + snippet.details.id;
+		hidden.style.display = "none";
+		hidden.setAttribute("class", "hidden");
+				
+		// details section
+		details.setAttribute("class", "legend");
+		dspan.setAttribute("class", "snippet_details");
+		dspan.innerHTML = 'Details';
+		details.appendChild(dspan);
+				
+		// setup right and left divs
+		lpanel.setAttribute("class", "lpanel");
+		rpanel.setAttribute("class", "rpanel");
+				
+		for (var key in snippet.details) {
+			var div1 = document.createElement('div'),
+				div2 = document.createElement('div');
+						
+			if (key === 'name' || key == 'id') continue;
+						
+			// setup the right span
+			div1.innerHTML = snippet.details[key];
+			rpanel.appendChild(div1);
+						
+			// setup the left span
+			// replace '_' with a space, title case the string, and terminate it with a ':'
+			div2.innerHTML = title_case(inline_replace(key, "_", " ")) + ':';
+			lpanel.appendChild(div2);
+		}
+		details.appendChild(lpanel);
+		details.appendChild(rpanel);
+		hidden.appendChild(details);
+				
+		snip.setAttribute("class", "legend");
+		sspan.setAttribute("class", "snippet_details");
+		sspan.innerHTML = "Snippet Code";
+		snip.appendChild(sspan);
+		hidden.appendChild(snip);
+				
+		sarea.setAttribute("class", "sarea");
+		sarea.innerHTML = snippet.snippet;
+		hidden.appendChild(sarea);
+		li.appendChild(hidden);
+		
+		return li;
+	};
 	var render_snippets_by_language = function (lang, showLegend) {
 		if (lang in localStorage) {
 			var snippets_div = $('snippets'),
@@ -70,6 +142,7 @@
 				var legend = document.createElement('li'),
 					span = document.createElement('span');
 				legend.setAttribute("class", "legend");
+				span.setAttribute("class", "legend_span");
 				span.innerHTML = lang;
 				legend.appendChild(span);
 				wrapper.appendChild(legend);
@@ -77,73 +150,53 @@
 			
 			// create area for each snippet
 			for (var i = 0, len = snippets.length; i < len; i++) {
-				var snippet = snippets[i],
-					li = document.createElement('li'),
-					name = document.createElement('div'),
-					nspan = document.createElement('span'),
-					hidden = document.createElement('div'),
-					details = document.createElement('div'),
-					dspan = document.createElement('span'),
-					darea = document.createElement('div'),
-					rpanel = document.createElement('div'),
-					lpanel = document.createElement('div'),
-					snip = document.createElement('div'),
-					sspan = document.createElement('span'),
-					sarea = document.createElement('div');
-					
-				li.id = snippet.details.id;
-				li.addEventListener('click', expandSnippet);
-				nspan.setAttribute("class", "full");
-				nspan.innerHTML = snippet.details.name;
-				name.appendChild(nspan);
-				li.appendChild(name);
-				
-				// setup hidden div
-				hidden.id = "hidden_" + snippet.details.id;
-				hidden.style.display = "none";
-				hidden.setAttribute("class", "hidden");
-				
-				// details section
-				details.setAttribute("class", "legend");
-				dspan.innerHTML = 'Details';
-				details.appendChild(dspan);
-				
-				// setup right and left divs
-				lpanel.setAttribute("class", "lpanel");
-				rpanel.setAttribute("class", "rpanel");
-				
-				for (var key in snippet.details) {
-					var div1 = document.createElement('div'),
-						div2 = document.createElement('div');
-						
-					if (key === 'name' || key == 'id') continue;
-						
-					// setup the right span
-					div1.innerHTML = snippet.details[key];
-					rpanel.appendChild(div1);
-						
-					// setup the left span
-					// replace '_' with a space, title case the string, and terminate it with a ':'
-					div2.innerHTML = title_case(inline_replace(key, "_", " ")) + ':';
-					lpanel.appendChild(div2);
-				}
-				details.appendChild(lpanel);
-				details.appendChild(rpanel);
-				hidden.appendChild(details);
-				
-				snip.setAttribute("class", "legend");
-				sspan.innerHTML = "Snippet Code";
-				snip.appendChild(sspan);
-				hidden.appendChild(snip);
-				
-				sarea.setAttribute("class", "full");
-				sarea.innerHTML = snippet.snippet;
-				hidden.appendChild(sarea);
-				li.appendChild(hidden);
-				wrapper.appendChild(li);
+				wrapper.appendChild(render_snippet(snippets[i]));
 			}
 			snippets_div.appendChild(wrapper);
 		}
+	};
+	var toggle_snippets_popup = function (header_text) {
+		if (header_text === "" || header_text === undefined) {
+			throw "toggle_snippets_popup: header_text null or undefined!"
+		}
+		
+		$('h1header').innerHTML = header_text;
+		switch (window.getComputedStyle($('snippets_popup'), null).getPropertyValue('display')) {
+			case "none":
+				$('close_icon').style.display = 'inline';
+				if (get_page_name() === 'add_item.html') {
+					$('back_icon').style.display = 'none';
+					$('add_icon').style.display = 'inline';
+					$('h2header').style.display = 'none';
+				}
+				$('snippets_popup').style.display = 'block';
+				break;
+			case "block":
+				$('snippets_popup').style.display = 'none';
+				$('close_icon').style.display = 'none';
+				$('snippets').innerHTML = '';
+				if (get_page_name() === 'add_item.html') {
+					$('add_icon').style.display = 'none';
+					$('back_icon').style.display = 'inline';
+					$('h2header').style.display = 'block';
+				}
+				break;
+			default:
+				throw "toggle_snippets_popup: snippets_popup.style.display === " + $('snippets_popup').style.display;
+		}
+	};
+	var show_saved = function (snippet) {
+		var snippets_div = $('snippets'),
+			wrapper = document.createElement('ul');
+		
+		if (snippet === undefined) {
+			throw "show_saved: Snippet is null or undefined!";
+		}
+		
+		wrapper.appendChild(render_snippet(snippet));
+		snippets_div.appendChild(wrapper);
+		$('hidden_' + snippet.details.id).style.display = 'block'; // we want this shown
+		toggle_snippets_popup('Snippet Saved');
 	};
 
 	// *** START ripped from SDI Project 4 ***
@@ -174,14 +227,7 @@
 			}
 		}
 		
-		$('h1header').innerHTML = "All Snippets"
-		if (get_page_name() === 'add_item.html') {
-			$('back_icon').style.display = "none";
-			$('add_icon').style.display = "inline";
-			$('h2header').style.display = "none";
-		}
-		$('close_icon').style.display = "inline";
-		$('snippets_popup').style.display = "block";
+		toggle_snippets_popup('All Snippets');
 	};
 	var clearAll = function () {
 		if (confirm("Are you sure?\n\nYou will not be able to recover the data you are about to erase.")) {
@@ -193,17 +239,10 @@
 		(this.id === "add_icon") ? window.location.assign("add_item.html") : window.location.assign("index.html");
 	};
 	var closePopup = function () {
-		$('snippets_popup').style.display = "none";
-		$('h1header').innerHTML = 'My Snippets';
-		$('close_icon').style.display = "none";
-		if (get_page_name() === 'add_item.html') {
-			$('add_icon').style.display = "none";
-			$('back_icon').style.display = "inline";
-			$('h2header').style.display = "block";
-		}
-		$('snippets').innerHTML = '';
+		toggle_snippets_popup('My Snippets');
+		window.location.assign('index.html');
 	};
-	var saveData = function () {
+	var saveData = function (event) {
 		var language = $('language').value,
 			snippets = [], snippet = {};
 			
@@ -223,8 +262,8 @@
 		snippets.push(snippet);
 		localStorage.setItem(language.toString(), JSON.stringify(snippets));
 		
-		alert(snippet.details.name + " saved.");
-		return false;
+		show_saved(snippet);
+		event.preventDefault();
 	};
 	var expandSnippet = function () {
 		var hidden = $('hidden_' + this.id);
@@ -232,9 +271,7 @@
 	};
 	var clickListItem = function () {
 		render_snippets_by_language(this.id);
-		$('h1header').innerHTML = this.id;
-		$('close_icon').style.display = "inline";
-		$('snippets_popup').style.display = "block";
+		toggle_snippets_popup(this.id);
 	};
 		
 	//public
@@ -255,7 +292,8 @@
 		} else {
 			// add event listeners
 			$('back_icon').addEventListener('click', navigate);
-			$('submit').addEventListener('click', saveData);
+			// $('submit').addEventListener('click', saveData);
+			$('snippet_form').addEventListener('submit', saveData);
 			
 			populate_select();
 			
