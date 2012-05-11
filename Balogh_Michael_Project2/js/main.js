@@ -25,7 +25,7 @@
 	var render_help_message = function (list) {
 		var item = document.createElement('li');
 		if (list.nodeName !== 'UL' && list.nodeName !== 'OL') {
-			console.log("render_help_message: element is not a list!");
+			throw "render_help_message: element is not a list!";
 			return;
 		}
 		item.id = 'greyed';
@@ -36,10 +36,6 @@
 		var langs = load_counts(),
 			list = $('snippet_list');
 		if (langs.length === 0) {
-			// var item = document.createElement('li');
-			// 			item.id = 'greyed';
-			// 			item.innerHTML = "Click the '<strong>&#10010;</strong>' to add your first snippet.";
-			// 			list.appendChild(item);
 			render_help_message(list);
 		} else {
 			for (var i = 0, len = langs.length; i < len; i++) {
@@ -47,9 +43,6 @@
 					item = document.createElement('li');
 				
 				item.id = lang.name;
-				// FIXME: there must be a better way
-				// :after content in li doesn't show (it does in label tags inside li, but not in spans or the like) 
-				// in iphone simulator, so include it in the actual content instead.
 				item.innerHTML = lang.name + ' (' + lang.count.toString() + ')';
 				item.addEventListener('click', clickListItem);
 				list.appendChild(item);
@@ -123,16 +116,16 @@
 					var div1 = document.createElement('div'),
 						div2 = document.createElement('div');
 						
-						if (key === 'name' || key == 'id') continue;
+					if (key === 'name' || key == 'id') continue;
 						
-						// setup the right span
-						div1.innerHTML = snippet.details[key];
-						rpanel.appendChild(div1);
+					// setup the right span
+					div1.innerHTML = snippet.details[key];
+					rpanel.appendChild(div1);
 						
-						// setup the left span
-						// replace '_' with a space, title case the string, and terminate it with a ':'
-						div2.innerHTML = title_case(inline_replace(key, "_", " ")) + ':';
-						lpanel.appendChild(div2);
+					// setup the left span
+					// replace '_' with a space, title case the string, and terminate it with a ':'
+					div2.innerHTML = title_case(inline_replace(key, "_", " ")) + ':';
+					lpanel.appendChild(div2);
 				}
 				details.appendChild(lpanel);
 				details.appendChild(rpanel);
@@ -239,7 +232,7 @@
 	};
 	var clickListItem = function () {
 		render_snippets_by_language(this.id);
-		$('h1header').innerHTML = this.id + ' Snippets';
+		$('h1header').innerHTML = this.id;
 		$('close_icon').style.display = "inline";
 		$('snippets_popup').style.display = "block";
 	};
@@ -272,7 +265,7 @@
 			// hide add_icon until needed
 			$('add_icon').style.display = "none";
 			
-			// hide/show the sub-header when the snippet textarea is being edited for visibility
+			// hide/show the sub-header and footer when the snippet textarea is being edited for visibility
 			$('snippet').addEventListener('focus', function() { 
 				$('h2header').style.display = "none";
 				$('footer').style.display = "none";
