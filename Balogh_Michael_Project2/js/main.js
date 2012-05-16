@@ -1,4 +1,4 @@
-(function(ns, $, undefined) {
+!function(ns, $, undefined) {
 	// private variables
 	var snippet_langs = ['Bash', 'CSS', 'HTML', 'JavaScript', 'Perl', 'PHP', 'Python', 'Ruby'];
 	
@@ -32,9 +32,9 @@
 		item.innerHTML = "Click the '<strong>&#10010;</strong>' to add your first snippet.";
 		list.appendChild(item);
 	};
-	var populate_snippets_list = function () {
+	var populate_language_list = function () {
 		var langs = load_counts(),
-			list = $('snippet_list');
+			list = $('language_list');
 		if (langs.length === 0) {
 			render_help_message(list);
 		} else {
@@ -43,7 +43,9 @@
 					item = document.createElement('li');
 				
 				item.id = lang.name;
-				item.innerHTML = lang.name + ' (' + lang.count.toString() + ')';
+				item.setAttribute("data-count", lang.count.toString());
+				item.setAttribute("class", "lang_item");
+				item.innerHTML = lang.name + ' <em>(' + lang.count.toString() + ')</em>';
 				item.addEventListener('click', clickListItem);
 				list.appendChild(item);
 			}
@@ -59,7 +61,7 @@
 			select.appendChild(option);
 		}
 	};
-	var render_snippet = function (snippet) {
+	var render_snippet = function (snippet, language) {
 		var li = document.createElement('li'),
 			name = document.createElement('div'),
 			nspan = document.createElement('span'),
@@ -71,15 +73,21 @@
 			lpanel = document.createElement('div'),
 			snip = document.createElement('div'),
 			sspan = document.createElement('span'),
-			sarea = document.createElement('div');
+			// sarea = document.createElement('div'),
+			stext = document.createElement('textarea'),
+			barea = document.createElement('div'),
+			bedit = document.createElement('button'),
+			bdelete = document.createElement('button');
 			
 		if (snippet === null || snippet === undefined) {
-				throw "render_snippet: one or both of the required arguments is null";
+				throw "render_snippet: snippet argument is null or undefined";
 		}
+		language = language || undefined;
 		
-		li.id = snippet.details.id;
-		li.addEventListener('click', expandSnippet);
-		nspan.setAttribute("class", "full");
+		name.id = snippet.details.id
+		name.addEventListener('click', expandSnippet)
+		nspan.id = 'span_' + snippet.details.id;
+		nspan.setAttribute("class", "item_closed");
 		nspan.innerHTML = snippet.details.name;
 		name.appendChild(nspan);
 		li.appendChild(name);
@@ -88,6 +96,10 @@
 		hidden.id = "hidden_" + snippet.details.id;
 		hidden.style.display = "none";
 		hidden.setAttribute("class", "hidden");
+		hidden.setAttribute("data-name", snippet.details.name);
+		if (language !== undefined) {
+			hidden.setAttribute("data-language", language)
+		}
 				
 		// details section
 		details.setAttribute("class", "legend");
@@ -124,9 +136,31 @@
 		snip.appendChild(sspan);
 		hidden.appendChild(snip);
 				
-		sarea.setAttribute("class", "sarea");
-		sarea.innerHTML = snippet.snippet;
-		hidden.appendChild(sarea);
+		stext.setAttribute("class", "code")
+		stext.rows = "8";
+		stext.readOnly = "readonly";
+		stext.innerHTML = snippet.codebase;
+		hidden.appendChild(stext);
+		// hidden.appendChild(sarea);
+		
+		barea.setAttribute("class", "actions");
+		
+		bedit.type = 'button';
+		bedit.setAttribute("data-lang", language);
+		bedit.setAttribute("data-id", snippet.details.id);
+		bedit.addEventListener('click', editSnippet);
+		bedit.innerHTML = 'Edit';
+		barea.appendChild(bedit);
+		
+		bdelete.type = 'button';
+		bdelete.className = 'bright';
+		bdelete.setAttribute("data-lang", language);
+		bdelete.setAttribute("data-id", snippet.details.id);
+		bdelete.addEventListener('click', deleteSnippet);
+		bdelete.innerHTML = 'Delete';
+		barea.appendChild(bdelete);
+		hidden.appendChild(barea);
+		
 		li.appendChild(hidden);
 		
 		return li;
@@ -150,7 +184,7 @@
 			
 			// create area for each snippet
 			for (var i = 0, len = snippets.length; i < len; i++) {
-				wrapper.appendChild(render_snippet(snippets[i]));
+				wrapper.appendChild(render_snippet(snippets[i], lang));
 			}
 			snippets_div.appendChild(wrapper);
 		}
@@ -161,18 +195,22 @@
 		}
 		
 		$('h1header').innerHTML = header_text;
-		switch (window.getComputedStyle($('snippets_popup'), null).getPropertyValue('display')) {
+		switch (window.getComputedStyle($('popup'), null).getPropertyValue('display')) {
 			case "none":
+				$('content').style.display = 'none';
+				$('footer').style.display = 'none';
 				$('close_icon').style.display = 'inline';
 				if (get_page_name() === 'add_item.html') {
 					$('back_icon').style.display = 'none';
 					$('add_icon').style.display = 'inline';
 					$('h2header').style.display = 'none';
 				}
-				$('snippets_popup').style.display = 'block';
+				$('popup').style.display = 'block';
 				break;
 			case "block":
-				$('snippets_popup').style.display = 'none';
+				$('content').style.display = 'block';
+				$('footer').style.display = 'block';
+				$('popup').style.display = 'none';
 				$('close_icon').style.display = 'none';
 				$('snippets').innerHTML = '';
 				if (get_page_name() === 'add_item.html') {
@@ -182,27 +220,114 @@
 				}
 				break;
 			default:
-				throw "toggle_snippets_popup: snippets_popup.style.display === " + $('snippets_popup').style.display;
+				throw "toggle_snippets_popup: popup.style.display === " + $('popup').style.display;
 		}
 	};
-	var show_saved = function (snippet) {
+	var show_saved = function (snippet, language) {
 		var snippets_div = $('snippets'),
 			wrapper = document.createElement('ul');
 		
-		if (snippet === undefined) {
+		if (snippet === null || snippet === undefined) {
 			throw "show_saved: Snippet is null or undefined!";
 		}
 		
-		wrapper.appendChild(render_snippet(snippet));
+		wrapper.appendChild(render_snippet(snippet, language));
 		snippets_div.appendChild(wrapper);
+		$('span_' + snippet.details.id).className = 'item_opened';
 		$('hidden_' + snippet.details.id).style.display = 'block'; // we want this shown
 		toggle_snippets_popup('Snippet Saved');
+		// window.scrollTo(0, window.pageYOffset);
 	};
-
+	var add_errors = function (messages) {
+		var notifications = $('notifications');
+		if (notifications.getElementsByTagName('li').length !== 0) {
+			notifications.innerHTML = '';
+		}
+		if (messages === undefined || messages === null || messages.length === 0) {
+			var li = document.createElement('li');
+			li.className = 'notification';
+			li.innerHTML = '= information is required.';
+			notifications.appendChild(li);
+		} else {
+			for (var i = 0, len = messages.length; i < len; i++) {
+				var li = document.createElement('li');
+				li.className = 'error';
+				li.innerHTML = messages[i];
+				notifications.appendChild(li);
+			}
+		}
+		
+	};
+	var validate_form = function () {
+		var elements = $('snippet_form').elements, errors = [];
+		for (var i = 0, len = elements.length; i < len; i++) {
+			var element = elements[i];
+			console.log(element);
+			if (element.getAttribute('data-validation') !== null) {
+				switch (element.type) {
+					case "select-one": // single value select
+						if (snippet_langs.indexOf(element.value) === -1) {
+							errors.push("You must select a language for your snippet!");
+						}
+						break;
+					case "text":
+						var txt = element.value;
+						if (element.value === '') {
+							errors.push("Please name your snippet.");
+						} else if (RegExp.escape(txt) !== element.value) {
+							errors.push("Your snippet's name may contain letters, numbers, spaces, hyphens, and underscores.");
+						}
+						break;
+					case "date":
+						if (element.value === '' || element.value.match(/\d{4}-\d{1,2}-d{1,2}/)) {
+							errors.push('You must select a valid date!');
+						}						
+						break;
+					case "textarea":
+						if (element.value === '') {
+							errors.push("Your snippet contains no code. Please see to that.");
+						}
+						break;
+					default:
+						break;
+				}
+			}
+		}
+		if (errors.length !== 0) {
+			add_errors(errors);
+			return false;
+		}
+		return true;
+	};
+	var save_data = function () {
+		var language = $('language').value,
+			snippets = [], snippet = {};
+				
+		if (language in localStorage) {
+			snippets = JSON.parse(localStorage.getItem(language));
+		}
+		snippet = {
+			"details": {
+				"id": new Date().getTime().toString(),
+				"name": $('name').value,
+				"added_on": $('added_on').value,
+				"relevance": $('relevance').value,
+				"favorite": (($('favorite').checked) ? "Yes" : "No")
+			},
+			"codebase": $('codebase').value
+		};
+		snippets.push(snippet);
+		localStorage.setItem(language.toString(), JSON.stringify(snippets));
+		
+		show_saved(snippet, language);
+	};
+	
 	// *** START ripped from SDI Project 4 ***
 	// privately duck punch RegExp until it sounds like it contains a function to escape special characters
 	RegExp.escape = function(str) {
-		return str.replace(/[[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+		// return str.replace(/[[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+		// removed whitespace from escape
+		return str.replace(/[[\]{}()*+?.,\\^$|#]/g, "\\$&");
 	};
 	var title_case = function (string) {
 		// regexes to the rescue again. amazing how robust those little buggers are, isn't it?
@@ -211,6 +336,9 @@
 	var inline_replace = function (string, char1, char2) {
 		var pattern = new RegExp(RegExp.escape(char1), "g");
 		return string.replace(pattern, char2);
+	};
+	ns.s2n = function (string) {
+		return (string.indexOf('.') !== -1) ? parseFloat(string) : parseInt(string);
 	};
 	// *** END ripped from SDI Project 4 ***
 		
@@ -242,36 +370,46 @@
 		toggle_snippets_popup('My Snippets');
 		window.location.assign('index.html');
 	};
-	var saveData = function (event) {
-		var language = $('language').value,
-			snippets = [], snippet = {};
-			
-		if (language in localStorage) {
-			snippets = JSON.parse(localStorage.getItem(language));
-		}
-		snippet = {
-			"details": {
-				"id": new Date().getTime(),
-				"name": $('name').value,
-				"added_on": $('added_on').value,
-				"relevance": $('relevance').value,
-				"favorite": (($('favorite').checked) ? "Yes" : "No")
-			},
-			"snippet": $('snippet').value
-		};
-		snippets.push(snippet);
-		localStorage.setItem(language.toString(), JSON.stringify(snippets));
-		
-		show_saved(snippet);
+	var submitForm = function (event) {
 		event.preventDefault();
+		if (validate_form()) {
+			save_data();
+		}
+		// event.preventDefault();
 	};
 	var expandSnippet = function () {
 		var hidden = $('hidden_' + this.id);
+		var span = $('span_' + this.id);
 		(hidden.style.display === "none") ? hidden.style.display = "block" : hidden.style.display = "none";
+		(span.className === 'item_closed') ? span.className = 'item_opened' : span.className = 'item_closed';
 	};
 	var clickListItem = function () {
 		render_snippets_by_language(this.id);
 		toggle_snippets_popup(this.id);
+	};
+	var editSnippet = function (event) {
+		var language = this.getAttribute('data-lang'), snippet,
+			snippets = JSON.parse(localStorage.getItem(language));
+
+		event.preventDefault();
+		
+		for (var i = 0, len = snippets.length; i < len; i++) {
+			if (snippets[i].details.id === this.getAttribute('data-id')) {
+				snippet = snippets[i];
+			}
+		}
+		var href = ['add_item.html?language=', language, '&name=', snippet.details.name, '&added_on=', snippet.details.added_on,
+			'&relevance=', snippet.details.relevance, '&favorite=', ((snippet.details.favorite === 'Yes') ? 'on' : ''), 
+			'&codebase=', snippet.codebase];
+		location.replace(href.join(''));
+		// $('language').value = language;
+		// 		$('name').value = snippet.details.name;
+		// 		$('added_on').value = snippet.details.added_on;
+		// 		$('relevance').value = snippet.details.relevance;
+		// 		$('favorite').checked = ((snippet.details.favorite === 'Yes') ? 'checked' : '');
+	};
+	var deleteSnippet = function (event) {
+		
 	};
 		
 	//public
@@ -283,17 +421,17 @@
 		$('clear_all').addEventListener('click', clearAll);
 		
 		// fixup the top location of content and snippet_popup areas.
-		$('content').style.top = $('h1header').offsetHeight + 'px';
-		$('snippets_popup').style.top = $('h1header').offsetHeight + 'px';
+		// $('content').style.top = $('h1header').offsetHeight + 'px';
+		// $('popup').style.top = $('h1header').offsetHeight + 'px';
 		
 		// handle per-page setup
 		if (get_page_name() === 'index.html') {
-			populate_snippets_list();
+			populate_language_list();
 		} else {
 			// add event listeners
 			$('back_icon').addEventListener('click', navigate);
 			// $('submit').addEventListener('click', saveData);
-			$('snippet_form').addEventListener('submit', saveData);
+			$('snippet_form').addEventListener('submit', submitForm);
 			
 			populate_select();
 			
@@ -303,19 +441,27 @@
 			// hide add_icon until needed
 			$('add_icon').style.display = "none";
 			
+			// inform user about required fields
+			add_errors();
+			
+			// set max date to today
+			var temp = new Date(), tmonth = '0' + (temp.getMonth() + 1).toString(),
+				datestring = temp.getFullYear() + '-' + tmonth + '-' + temp.getDate();
+			$('added_on').setAttribute("max", datestring);
+			
 			// hide/show the sub-header and footer when the snippet textarea is being edited for visibility
-			$('snippet').addEventListener('focus', function() { 
+			$('codebase').addEventListener('focus', function() { 
 				$('h2header').style.display = "none";
 				$('footer').style.display = "none";
 			});
-			$('snippet').addEventListener('blur', function() {
+			$('codebase').addEventListener('blur', function() {
 				$('h2header').style.display = "block";
 				$('footer').style.bottom = 0;
 				$('footer').style.display = "block";
 			});
 		}
 	};
-} (window.vfw = window.vfw || {}, function(element) { return document.getElementById(element); }));
+} (window.vfw = window.vfw || {}, function(element) { return document.getElementById(element); });
 
 try {
 	document.addEventListener("DOMContentLoaded", vfw.initialize, false);
