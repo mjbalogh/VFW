@@ -109,29 +109,29 @@
 				var lang = langs[i],
 				item = document.createElement('li');
 				
-        item.id = lang.name;
-        item.className = 'lang-item li-div';
-        item.setAttribute("data-count", lang.count.toString());
-        item.innerHTML = lang.name;
-        item.addEventListener('click', clickListItem);
-        list.appendChild(item);
-      }
-    }
-  }
-  function populate_select () {
-  	var select = $('#language');
+		        item.id = lang.name;
+		        item.className = 'lang-item li-div';
+		        item.setAttribute("data-count", lang.count.toString());
+		        item.innerHTML = lang.name;
+		        item.addEventListener('click', clickListItem);
+		        list.appendChild(item);
+	    	}
+		}
+	}
+	function populate_select () {
+	  	var select = $('#language');
 
-  	if ($('#language').options.length > 1) return;
+	  	if ($('#language').options.length > 1) return;
 
-  	for (var i = 0, len = supported_langs.length; i < len; i++) {
-  		var option = document.createElement('option'),
-  			language = supported_langs[i];
+	  	for (var i = 0, len = supported_langs.length; i < len; i++) {
+	  		var option = document.createElement('option'),
+	  			language = supported_langs[i];
 
-  		option.value = language;
-  		option.innerHTML = language;
-  		select.appendChild(option);
-  	}
-  }
+	  		option.value = language;
+	  		option.innerHTML = language;
+	  		select.appendChild(option);
+	  	}
+	  }
   function render_help_message (list) {
 		var item = document.createElement('li');
 		if (list.nodeName !== 'UL' && list.nodeName !== 'OL') {
