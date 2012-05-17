@@ -95,8 +95,13 @@
 	};
 	
 	ns.Controller = function() {
-		
+		var views = []
 	};
+	ns.Controller.prototype.addView = function (view) {
+		if (!(view in views)) {
+			views.push(view)
+		}
+	}
 	ns.View = function() {
 		extend(Notifier);
 	};
@@ -192,13 +197,13 @@
 	};
 
 	// define homeView methods
-		homeView.receive = function (name, data) {
-			switch (name) {
-				case 'activate':
-					(data === 'home') ? this.activate(true) : this.activate(false);
-				break;
-			};
-		};
+		// homeView.receive = function (name, data) {
+		// 	switch (name) {
+		// 	case 'activate':
+		// 		(data === 'home') ? this.activate(true) : this.activate(false);
+		// 		break;
+		// 	};
+		// };
 		homeView.activate = function (isActive) {
 			if (!isActive) {
 				$('#content').innerHTML = '';

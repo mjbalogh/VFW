@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<!-- Project: 3 -->
+<!-- Class: Visual Frameworks -->
+<!-- Term: 1205 -->
+<!-- Author: Michael Balogh -->
+<html>
+	<head>
+		<!-- meta tags -->
+		<meta charset="utf-8" />
+		<meta name="description" content="Web-based snippet app for VFW class at Full Sail" />
+		<meta name="keywords" content="code snippets, programming, development, Full Sail University, Mobile Development, VFW, Visual Frameworks" />
+		<meta name="application-name" content="My Snippets" />
+		<meta name="robots" content="index,follow" />
+		<meta name="viewport" content="user-scalable=no width=device-width height=device-height minimum-scale=1.0 maximum-scale=1.0 initial-scale=1.0" />
+		<!-- run in "full screen" mode -->
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+
+		<title>My Snippets</title>
+		
+		
+		<link rel="stylesheet" href="css/style.css" media="screen" />
+	</head>
+	<body>
+		<header><h1 id="page-header">My Snippets</h1></header>
+		<nav>
+			<span class="icon right" id="add-icon">&#10010;</span>
+			<span class="icon left" id="close-icon">&#10006;</span>
+			<span class="icon left" id="back-icon">&#9664;</span>
+		</nav>
+		<div id="content">
+			<section id="home">
+				<div class="tagline">The <strong>best</strong> way to access your snippets!</div>
+				<ul id="language_list"></ul>
+			</section>
+			<section id="add-item">
+				<div><ul id="notifications"></ul></div>
+				<form action="#" method="post" id="snippet_form">
+					<ul>
+						<li class="legend"><span class="legend_span">Details</span></li>
+						<li>
+							<div class="li-div">
+								<label for"language" class="required">Language:</label>
+								<select name="language" id="language" size="1" tabindex="1" data-validation="required" autoselect>
+									<option value="--Select Language--">--Select Language--</option>
+								</select>
+							</div>
+						</li>
+						<li>
+							<div class="li-div">
+								<label for="name" class="required">Name:</label>
+								<input type="text" name="name" id="name" tabindex="2" data-validation="required" placeholder="Snippet name" />
+							</div>
+						</li>
+						<li>
+							<div class="li-div">
+								<label for="added_on" class="required">Added on:</label>
+								<input type="date" name="added_on" id="added_on" tabindex="3" data-validation="required" />
+							</div>
+						</li>
+						<li>
+							<div class="li-div">
+								<label for="relevance">Relevance:</label>
+								<input type="range" name="relevance" value="0" id="relevance" min="0" max="100" step="1" tabindex="4" />
+							</div>
+						</li>
+						<li>
+							<div class="li-div">
+								<input type="checkbox" name="favorite" id="favorite" tabindex="5" />
+								<label for="favorite">Mark as favorite</label>
+							</div>
+						</li>
+					</ul>
+					<ul>
+						<li class="legend"><span class="legend_span required">Snippet</span></li>
+						<li><textarea name="codebase" rows="8" cols="42" id="codebase" class="code" tabindex="6" data-validation="required" placeholder="Enter snippet text here"></textarea></li>
+					</ul>
+					<input type="hidden" value="" id="id" />
+					<div class="actions">
+						<button type="reset">Reset</button>
+						<button type="submit" id="submit" class="right" tabindex="7">Save</button>
+					</div>
+				</form>
+			</section>
+			<section id="popup">
+				<div id="snippets"></div>
+			</section>
+		</div>
+		<footer id="footer">
+			<span id="show-all">Show all</span>
+			<span id="clear-all">Clear all</span>
+		</footer>
+		<script type="text/javascript" src="js/main.js"></script>
+	</body>
+</html>
