@@ -1,5 +1,5 @@
 /*
-	Project: 3
+	Project: 4
 	Class: Visual Frameworks
 	Term: 1205
 	Author: Michael Balogh
@@ -30,6 +30,7 @@
 }(window);
 
 !function (ns, undefined) {
+	"use strict";
 	var slice = Array.prototype.slice;
 	window.debug = window.debug || true;
 	
@@ -466,7 +467,7 @@
 
 	// event handlers
 	function showAll () {
-		if (!!window.debug) {
+		if (!!window.debug && load_counts().length === 0) {
 			if (confirm("Do you want to load the test fixtures?")) {
 				loadFixtures();
 			}
@@ -554,7 +555,6 @@
 			if (language in localStorage) {
 				var snippets = get_by_language(language);
 				if (id in snippets) delete snippets[id];
-				console.log(snippets[id]);
 				if (Object.keys(snippets).length === 0){
 					localStorage.removeItem(language);
 				} else {

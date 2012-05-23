@@ -75,8 +75,6 @@ function loadFixtures () {
 		
 	for (var key in fixture) {
 		if (fixture.hasOwnProperty(key)) {
-			console.log(key);
-			console.log(fixture[key]);
 			localStorage.setItem(key, JSON.stringify(fixture[key]));
 		}
 	}

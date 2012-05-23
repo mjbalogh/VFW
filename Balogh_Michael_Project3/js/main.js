@@ -132,7 +132,7 @@
 	  		select.appendChild(option);
 	  	}
 	  }
-  function render_help_message (list) {
+	function render_help_message (list) {
 		var item = document.createElement('li');
 		if (list.nodeName !== 'UL' && list.nodeName !== 'OL') {
 			throw "render_help_message: element is not a list!";
@@ -142,21 +142,21 @@
 		list.appendChild(item);
 	}
 	function render_snippet (snippet, language, id) {
-  	var li = document.createElement('li'),
-	  	name = document.createElement('div'),
-	  	nspan = document.createElement('span'),
-	  	hidden = document.createElement('div'),
-	  	details = document.createElement('div'),
-	  	dspan = document.createElement('span'),
-	  	darea = document.createElement('div'),
-	  	rpanel = document.createElement('div'),
-	  	lpanel = document.createElement('div'),
-	  	snip = document.createElement('div'),
-	  	sspan = document.createElement('span'),
-	  	stext = document.createElement('textarea'),
-	  	barea = document.createElement('div'),
-	  	bedit = document.createElement('button'),
-	  	bdelete = document.createElement('button');
+		var li = document.createElement('li'),
+		  	name = document.createElement('div'),
+		  	nspan = document.createElement('span'),
+		  	hidden = document.createElement('div'),
+		  	details = document.createElement('div'),
+		  	dspan = document.createElement('span'),
+		  	darea = document.createElement('div'),
+		  	rpanel = document.createElement('div'),
+		  	lpanel = document.createElement('div'),
+		  	snip = document.createElement('div'),
+		  	sspan = document.createElement('span'),
+		  	stext = document.createElement('textarea'),
+		  	barea = document.createElement('div'),
+		  	bedit = document.createElement('button'),
+		  	bdelete = document.createElement('button');
 
 		if (snippet === null || snippet === undefined) {
 			throw "render_snippet: snippet argument is null or undefined";
@@ -357,10 +357,10 @@
 						}
 						break;
 					case "text":
-						var txt = element.value, regex = /^[-\s\w&]+&/g;
+						var txt = element.value, regex = /^[-\s\w&]+$/g;
 						if (element.value === '') {
 							errors.push("Please name your snippet.");
-						} else if (!(regex.test(element.value))) {//(RegExp.escape(txt) !== element.value) {
+						} else if (!(regex.test(element.value))) {
 							errors.push("Your snippet's name may contain letters, numbers, spaces, hyphens, and apmersands.");
 						}
 						break;

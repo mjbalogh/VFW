@@ -1,8 +1,9 @@
 /*
 	Filename: include.js
 	Author: Michael Balogh
-	Note: exports include function. This function allows a js file to require another js/css file. this file wil be loaded
-		into the DOM as the first script file of the body, or if the body is not available, as the last child of the head
+	Note: implements require function. This function allows a js file to require another js/css file. this file wil be loaded
+		into the DOM as the first script file of the body, or if the body is not available, as the last child of the head.
+		(CSS files will always be inserted as the last child of the head element).
 */
 !function (window) {
 	var queue = [], done = {}, isDomReady = false, document = window.document;
